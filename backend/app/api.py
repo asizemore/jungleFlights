@@ -26,15 +26,18 @@ class FlightModel(BaseModel):
     ground_speed: float
     latitude: float
     longitude: float
+    aircraft_code: str
     # Add other attributes as needed
 
 def convert_flight_to_model(flight: Any) -> FlightModel:
+
     return FlightModel(
         destination_airport_iata=flight.destination_airport_iata,
         callsign=flight.callsign,
         ground_speed=flight.ground_speed,
         latitude=flight.latitude,
         longitude=flight.longitude,
+        aircraft_code=flight.aircraft_code,
     )
 
 app = FastAPI()

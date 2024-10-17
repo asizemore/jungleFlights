@@ -6,5 +6,6 @@ export type Flight = {
     ground_speed: number,
     latitude: number,
     longitude: number,
+    aircraft_code: string,
     status?: string,
 }
