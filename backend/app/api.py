@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import time
 from FlightRadar24 import FlightRadar24API
+from pydantic import BaseModel
+from typing import Any
 
 
 
@@ -17,6 +19,26 @@ todos = [
 ]
 
 north_runway_bounds = "33.951072,33.9474,-118.434974,-118.3991"
+
+class FlightModel(BaseModel):
+    destination_airport_iata: str
+    callsign: str
+    ground_speed: float
+    latitude: float
+    longitude: float
+    aircraft_code: str
+    # Add other attributes as needed
+
+def convert_flight_to_model(flight: Any) -> FlightModel:
+
+    return FlightModel(
+        destination_airport_iata=flight.destination_airport_iata,
+        callsign=flight.callsign,
+        ground_speed=flight.ground_speed,
+        latitude=flight.latitude,
+        longitude=flight.longitude,
+        aircraft_code=flight.aircraft_code,
+    )
 
 app = FastAPI()
 
@@ -50,7 +72,10 @@ async def get_pdrflights() -> list:
     flights = fr_api.get_flights(bounds = north_runway_bounds) # List of Flights
 
     # We only care about flights leaving LAX
-    departing_flights = [flight for flight in flights if (flight.destination_airport_iata != "LAX") and (flight.number)]
+    departing_flights = [convert_flight_to_model(flight) for flight in flights if (flight.destination_airport_iata != "LAX") and (flight.number)]
     
+    # Serialize departing_flights
+
+
     return departing_flights
 
