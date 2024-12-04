@@ -1,11 +1,12 @@
 import React from "react";
 import { render } from 'react-dom';
-import FlightDescriptions from "./components/FlightDescriptions"
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import AppBar from "@mui/material/AppBar";
 import DepartingFlightStack from "./components/DepartingFlightStack";
 import UpcomingDeparturesStack from "./components/UpcomingDeparturesStack";
+import './styles/styles.css'; // Import the CSS file
+import { Typography } from "@mui/material";
 
 
 function App() {
@@ -16,13 +17,17 @@ function App() {
           <AppBar position="static">
             <h2>Jungle Noises</h2>
           </AppBar>
+          <Typography variant="h4" component='div' sx={{padding: '50px'}}>
+            Currently departing
+          </Typography>
           <DepartingFlightStack />
-          {/* Next to depart stack */}
+          <Typography variant="h4" component='div' sx={{padding: '50px'}}>
+            Upcoming Departures
+          </Typography>
           <UpcomingDeparturesStack />
         </Stack>
       </Box>
     </div>
-    
   )
 }
 

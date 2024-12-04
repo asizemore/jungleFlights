@@ -28,19 +28,17 @@ export default function UpcomingDeparturesStack() {
     // Let's split up flights based on if they're just chilling on the runway or if they're taking off.
     const flights_on_runway = departing_flights.filter(flight => flight.ground_speed < 50);
 
-    const cardContent = function(flight: Flight) {
+    const createCardContent = function(flight: Flight) {
         return (
-            <React.Fragment>
-                <CardContent>
-                    <Typography variant="h5" component="div">
-                        {flight.callsign}
-                    </Typography>
-                    <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{flight.aircraft_code}</Typography>
-                    <Typography variant="body2">
-                    Destination: {flight.destination_airport_iata}
-                    </Typography>
-                </CardContent>
-            </React.Fragment>
+            <CardContent>
+                <Typography variant="h5" component="div">
+                    {flight.callsign}
+                </Typography>
+                <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{flight.aircraft_code}</Typography>
+                <Typography variant="body2">
+                Destination: {flight.destination_airport_iata}
+                </Typography>
+            </CardContent>
         )
     };
       
@@ -55,12 +53,12 @@ export default function UpcomingDeparturesStack() {
     // 'Spose could do it here just to see if it works but really i need to add a wrapping component.
 
     return (
-        <Stack spacing={2} direction="row" sx={{ alignItems: 'center', justifyItems: 'flex-start', width: '100%'}}>
+        <Stack spacing={2} direction="row" sx={{ alignItems: 'center', justifyItems: 'flex-start', width: '90%'}}>
             {flights_on_runway.length > 0
                 ? flights_on_runway.map(flight => {
                     return (
-                        <Card key={flight.callsign} style={{width:'300px', padding:'10px'}}>
-                            {cardContent(flight)}
+                        <Card key={flight.callsign} style={{width:'300px', padding:'10px', height:'140px'}}>
+                            {createCardContent(flight)}
                         </Card>
                     )
                 })
