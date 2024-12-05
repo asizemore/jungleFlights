@@ -1,22 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import time
+import pandas as pd
 from FlightRadar24 import FlightRadar24API
 from pydantic import BaseModel
 from typing import Any
 
 
-
-todos = [
-    {
-        "id": "1",
-        "item": "Read a book."
-    },
-    {
-        "id": "2",
-        "item": "Cycle around town."
-    }
-]
+# Convert aircraft code to display names
+df = pd.read_csv('static/aircraft_code_conversion.csv')
+aircraft_code_to_display_name = dict(zip(df['aircraft_code'], df['display_name']))
 
 north_runway_bounds = "33.951072,33.9474,-118.434974,-118.3991"
 
@@ -27,6 +20,7 @@ class FlightModel(BaseModel):
     latitude: float
     longitude: float
     aircraft_code: str
+    aircraft_code_display_name: str
     # Add other attributes as needed
 
 def convert_flight_to_model(flight: Any) -> FlightModel:
@@ -38,6 +32,7 @@ def convert_flight_to_model(flight: Any) -> FlightModel:
         latitude=flight.latitude,
         longitude=flight.longitude,
         aircraft_code=flight.aircraft_code,
+        aircraft_code_display_name=aircraft_code_to_display_name.get(flight.aircraft_code, 'Unknown Aircraft Code')
     )
 
 app = FastAPI()
