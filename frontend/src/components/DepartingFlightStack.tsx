@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import { Flight } from "../types/Flight";
+import { Typography } from "@mui/material";
+import Box from "@mui/material/Box";
 
 // Here is where the functions for grabbing the info go
 
@@ -28,21 +30,27 @@ export default function DepartingFlightStack() {
     const flights_taking_off = departing_flights.filter(flight => flight.ground_speed >= 50);
     
 
-
     return (
         <Stack direction='row' spacing={2} sx={{ alignItems: 'center', justifyItems: 'flex-start'}}>
             <Paper sx={{padding: 2, width:'600px', height: '400px'}}>
                 <h3> Plot but a really long title</h3>
             </Paper>
             <Paper sx={{padding: 2, height: '400px', paddingX: 5}}>
-                <h3> Currently taking off: </h3>
-                {flights_taking_off.length > 0
-                    ? flights_taking_off.map(flight => {
-                        return (
-                            <p key={flight.callsign}>{flight.callsign}, destination {flight.destination_airport_iata}, speed {flight.ground_speed}, aircraft {flight.aircraft_code_display_name}</p>
-                        )
-                    })
-                : <p> No flights currently taking off </p>}
+                {flights_taking_off.length > 0 ?
+                    (
+                        <Box sx={{paddingTop: 2}}>
+                            <Typography variant='h4'> {flights_taking_off[0].callsign} </Typography>
+                            <Typography sx={{ color: 'text.secondary', mb: 1.5 }}> Aircraft: {flights_taking_off[0].aircraft_code_display_name} </Typography>
+                            <Typography variant='h6'> Destination: {flights_taking_off[0].destination_airport_iata} </Typography>
+                            <Typography variant='h6'> Ground speed: {flights_taking_off[0].ground_speed} </Typography>
+                        </Box>
+                    )
+                    : (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                            <Typography variant='h5'> No flights taking off </Typography>
+                        </Box>
+                    )
+                }
             </Paper>
         </Stack>
     )
