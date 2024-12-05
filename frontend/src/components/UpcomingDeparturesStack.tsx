@@ -34,7 +34,7 @@ export default function UpcomingDeparturesStack() {
                 <Typography variant="h5" component="div">
                     {flight.callsign}
                 </Typography>
-                <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{flight.aircraft_code}</Typography>
+                <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>{flight.aircraft_code_display_name}</Typography>
                 <Typography variant="body2">
                 Destination: {flight.destination_airport_iata}
                 </Typography>

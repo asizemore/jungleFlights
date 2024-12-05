@@ -8,4 +8,5 @@ export type Flight = {
     longitude: number,
     aircraft_code: string,
     status?: string,
+    aircraft_code_display_name?: string,
 }

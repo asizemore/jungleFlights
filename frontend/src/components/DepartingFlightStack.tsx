@@ -39,7 +39,7 @@ export default function DepartingFlightStack() {
                 {flights_taking_off.length > 0
                     ? flights_taking_off.map(flight => {
                         return (
-                            <p key={flight.callsign}>{flight.callsign}, destination {flight.destination_airport_iata}, speed {flight.ground_speed}</p>
+                            <p key={flight.callsign}>{flight.callsign}, destination {flight.destination_airport_iata}, speed {flight.ground_speed}, aircraft {flight.aircraft_code_display_name}</p>
                         )
                     })
                 : <p> No flights currently taking off </p>}
