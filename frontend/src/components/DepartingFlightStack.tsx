@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
-import { Flight } from "../types/Flight";
+import { Flight, FlightDetails } from "../types/Flight";
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 
@@ -9,7 +9,10 @@ import Box from "@mui/material/Box";
 
 export default function DepartingFlightStack() {
 
-    const [departing_flights, setFlights] = useState<Array<Flight>>([])
+    // departing_flights might not be needed...
+    const [departing_flights, setFlights] = useState<Array<Flight>>([]) 
+    const [flight_on_runway, setFlightOnRunway] = useState<FlightDetails | null>(null);
+
     const fetchFlights = async () => {
         const response = await fetch("http://localhost:8000/pdrflights")
         const departing_flights = await response.json()
@@ -18,15 +21,24 @@ export default function DepartingFlightStack() {
 
     // Fetch a specific flight with /flightonrunway
     const fetchFlightOnRunway = async(flight: Flight) => {
-        const response = await fetch("http://localhost:8000/flightonrunway", {
-            method: 'POST', // Change to POST method
-            headers: {
-                'Content-Type': 'application/json', // Add headers
-            },
-            body: JSON.stringify(flight) // Add body data as needed
-        });
-        const flight_on_runway = await response.json();
-        setFlights(flight_on_runway);
+        for (let i = 0; i < 20; i++) {
+            console.log(i);
+            const response = await fetch("http://localhost:8000/flightonrunway", {
+                method: 'POST', // Change to POST method
+                headers: {
+                    'Content-Type': 'application/json', // Add headers
+                },
+                body: JSON.stringify(flight) // Add body data as needed
+            });
+            const flight_on_runway = await response.json();
+            setFlightOnRunway(flight_on_runway);
+
+            // Wait for 2 seconds before fetching again
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+
+        // Clear state
+        setFlightOnRunway(null);
     }
 
 
@@ -34,18 +46,21 @@ export default function DepartingFlightStack() {
         fetchFlights()
 
         // Set up an interval to fetch data every second
-        const intervalId = setInterval(fetchFlights, 1000);
+        const intervalId = setInterval(fetchFlights, 3000);
 
         // Clear the interval on component unmount
         return () => clearInterval(intervalId);
     }, []); // Empty dependency array to run once on mount
 
+
     // Let's split up flights based on if they're just chilling on the runway or if they're taking off.
-    const flights_on_runway = departing_flights.filter(flight => flight.ground_speed < 50);
     const flights_taking_off = departing_flights.filter(flight => flight.ground_speed >= 50);
-    if (flights_taking_off.length > 0) {
-        fetchFlightOnRunway(flights_taking_off[0]);
-    }
+    useEffect(() => {
+        if (flights_taking_off.length > 0) {
+            fetchFlightOnRunway(flights_taking_off[0]);
+        }
+    }, [flights_taking_off]); // Dependency array to run when flights_taking_off changes
+
     
 
     return (
@@ -54,13 +69,13 @@ export default function DepartingFlightStack() {
                 <h3> Plot but a really long title</h3>
             </Paper>
             <Paper sx={{padding: 2, height: '400px', paddingX: 5}}>
-                {flights_taking_off.length > 0 ?
+                {flight_on_runway ?
                     (
                         <Box sx={{paddingTop: 2}}>
-                            <Typography variant='h4'> {flights_taking_off[0].callsign} </Typography>
-                            <Typography sx={{ color: 'text.secondary', mb: 1.5 }}> Aircraft: {flights_taking_off[0].aircraft_code_display_name} </Typography>
-                            <Typography variant='h6'> Destination: {flights_taking_off[0].destination_airport_iata} </Typography>
-                            <Typography variant='h6'> Ground speed: {flights_taking_off[0].ground_speed} </Typography>
+                            <Typography variant='h4'> {flight_on_runway.identification.callsign} </Typography>
+                            <Typography sx={{ color: 'text.secondary', mb: 1.5 }}> Aircraft: {flight_on_runway.aircraft.model.text} </Typography>
+                            <Typography variant='h6'> Destination: {flight_on_runway.airport.destination.name} </Typography>
+                            <Typography variant='h6'> Ground speed: {flight_on_runway.trail[0].spd} kts</Typography>
                         </Box>
                     )
                     : (

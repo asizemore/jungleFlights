@@ -69,9 +69,6 @@ async def get_pdrflights() -> list:
     fr_api = FlightRadar24API()
     flights = fr_api.get_flights(bounds = north_runway_bounds) # List of Flights
 
-    # Print out the first flight
-    print(flights[0])
-
 
     # We only care about flights leaving LAX
     departing_flights = [convert_flight_to_model(flight) for flight in flights if (flight.destination_airport_iata != "LAX") and (flight.number)]
