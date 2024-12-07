@@ -15,6 +15,21 @@ export default function DepartingFlightStack() {
         const departing_flights = await response.json()
         setFlights(departing_flights)
     }
+
+    // Fetch a specific flight with /flightonrunway
+    const fetchFlightOnRunway = async(flight: Flight) => {
+        const response = await fetch("http://localhost:8000/flightonrunway", {
+            method: 'POST', // Change to POST method
+            headers: {
+                'Content-Type': 'application/json', // Add headers
+            },
+            body: JSON.stringify(flight) // Add body data as needed
+        });
+        const flight_on_runway = await response.json();
+        setFlights(flight_on_runway);
+    }
+
+
     useEffect(() => {
         fetchFlights()
 
@@ -28,6 +43,9 @@ export default function DepartingFlightStack() {
     // Let's split up flights based on if they're just chilling on the runway or if they're taking off.
     const flights_on_runway = departing_flights.filter(flight => flight.ground_speed < 50);
     const flights_taking_off = departing_flights.filter(flight => flight.ground_speed >= 50);
+    if (flights_taking_off.length > 0) {
+        fetchFlightOnRunway(flights_taking_off[0]);
+    }
     
 
     return (
