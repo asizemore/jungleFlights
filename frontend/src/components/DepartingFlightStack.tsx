@@ -20,17 +20,20 @@ export default function DepartingFlightStack() {
     }
 
     // Fetch a specific flight with /flightonrunway
-    const fetchFlightOnRunway = async(flight: Flight) => {
+    const fetchFlightOnRunway = async(flight_taking_off_id: string) => {
         for (let i = 0; i < 20; i++) {
             console.log(i);
+            console.log(departing_flights.filter(flight => flight.id === flight_taking_off_id));
+
             const response = await fetch("http://localhost:8000/flightonrunway", {
                 method: 'POST', // Change to POST method
                 headers: {
                     'Content-Type': 'application/json', // Add headers
                 },
-                body: JSON.stringify(flight) // Add body data as needed
+                body: JSON.stringify(departing_flights.filter(flight => flight.id === flight_taking_off_id)[0]) // Add body data as needed
             });
             const flight_on_runway = await response.json();
+            console.log(flight_on_runway);
             setFlightOnRunway(flight_on_runway);
 
             // Wait for 2 seconds before fetching again
@@ -55,11 +58,12 @@ export default function DepartingFlightStack() {
 
     // Let's split up flights based on if they're just chilling on the runway or if they're taking off.
     const flights_taking_off = departing_flights.filter(flight => flight.ground_speed >= 50);
+    const flight_taking_off_id = flights_taking_off.length > 0 ? flights_taking_off[0].id : null;
     useEffect(() => {
-        if (flights_taking_off.length > 0) {
-            fetchFlightOnRunway(flights_taking_off[0]);
+        if (flight_taking_off_id) {
+            fetchFlightOnRunway(flight_taking_off_id);
         }
-    }, [flights_taking_off]); // Dependency array to run when flights_taking_off changes
+    }, [flight_taking_off_id]); // Dependency array to run when flights_taking_off changes
 
     
 
