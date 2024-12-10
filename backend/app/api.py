@@ -21,8 +21,10 @@ class FlightModel(BaseModel):
     longitude: float
     aircraft_code: str
     aircraft_code_display_name: str
+    id: str
     # Add other attributes as needed
 
+# For help, check out https://github.com/JeanExtreme002/FlightRadarAPI/blob/main/python/FlightRadar24/entities/flight.py#L7
 def convert_flight_to_model(flight: Any) -> FlightModel:
 
     return FlightModel(
@@ -32,7 +34,8 @@ def convert_flight_to_model(flight: Any) -> FlightModel:
         latitude=flight.latitude,
         longitude=flight.longitude,
         aircraft_code=flight.aircraft_code,
-        aircraft_code_display_name=aircraft_code_to_display_name.get(flight.aircraft_code, 'Unknown Aircraft Code')
+        aircraft_code_display_name=aircraft_code_to_display_name.get(flight.aircraft_code, 'Unknown Aircraft Code'),
+        id=flight.id
     )
 
 app = FastAPI()
@@ -66,6 +69,7 @@ async def get_pdrflights() -> list:
     fr_api = FlightRadar24API()
     flights = fr_api.get_flights(bounds = north_runway_bounds) # List of Flights
 
+
     # We only care about flights leaving LAX
     departing_flights = [convert_flight_to_model(flight) for flight in flights if (flight.destination_airport_iata != "LAX") and (flight.number)]
     
@@ -73,4 +77,15 @@ async def get_pdrflights() -> list:
 
 
     return departing_flights
+
+
+# For a particular flight, get the details of that flight
+@app.post("/flightonrunway", tags=["flightonrunway"])
+async def get_flightonrunway(flight: FlightModel) -> dict:
+    
+        fr_api = FlightRadar24API()
+        flight_details = fr_api.get_flight_details(flight)
+
+        return flight_details
+
 
