@@ -1,7 +1,28 @@
-import react from 'react';
+import React from 'react';
+import { XYChart, LineSeries, Axis } from '@visx/xychart';
 
 
-// Let's just do visx for now. They're pleasant
-
-// import {XYChart, LineSeries, XAxis, YAxis } from '@visx/xychart';
-
+type AltitudePlotProps = {
+    data: { x: number, y: number }[]
+  }
+  
+export default function AltitudePlot(props: AltitudePlotProps) {
+    const inputData = props.data;
+    return (
+      <XYChart
+        xScale={{ type: 'linear' }}
+        yScale={{ type: 'linear' }}
+        width={300}
+        height={300}
+      >
+        <Axis orientation="bottom" />
+        <Axis orientation="left" />
+        <LineSeries
+          data={inputData}
+          xAccessor={(d: { x: number, y: number }) => d.x} 
+          yAccessor={(d: { x: number, y: number }) => d.y}
+          dataKey={"key1"}
+        />
+      </XYChart>
+    );
+  }
