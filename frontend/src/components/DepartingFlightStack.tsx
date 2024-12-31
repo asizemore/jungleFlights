@@ -28,33 +28,29 @@ export default function DepartingFlightStack() {
 
 
     // Fetch a specific flight with /flightonrunway
-    const fetchFlightOnRunway = async(flight_taking_off_id: string) => {
-        for (let i = 0; i < 20; i++) {
+    const fetchFlightOnRunway = async (flight_taking_off_id: string) => {
 
+        for (let i = 0; i < 20; i++) {
             const response = await fetch("http://localhost:8000/flightonrunway", {
-                method: 'POST', // Change to POST method
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json', // Add headers
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(departing_flights.filter(flight => flight.id === flight_taking_off_id)[0]) // Add body data as needed
+                body: JSON.stringify(departing_flights.filter(flight => flight.id === flight_taking_off_id)[0])
             });
             const flight_on_runway = await response.json();
-            console.log(flight_on_runway);
+
             setFlightOnRunway(flight_on_runway);
 
             // Update the altitude data
-            const newAltitude: number = +flight_on_runway.trail[0].alt;
-            // const newAltitudeData = altitudeData.push({x: i, y: newAltitude});
-            const newAltitudeData = [...altitudeData, {x: i, y: newAltitude}];
-            setAltitudeData(newAltitudeData);
-            console.log(newAltitudeData);
-            // ignore the type error for now
-            // @ts-ignore
-            // setAltitudeData(altitudeData.push({x: i, y: Number(flight_on_runway.trail[0].alt)}) as AltitudeData[]);
-            console.log(altitudeData);
-
-            // Wait for 2 seconds before fetching again
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Use a functional update to ensure we're updating the previous state.
+            setAltitudeData((prevAltitudeData: AltitudeData[]) => {
+                const newAltitude: number = +flight_on_runway.trail[0].alt;
+                const newAltitudeData = [...prevAltitudeData, { x: i, y: newAltitude }];
+                return newAltitudeData;
+            });
+            // Wait for 3 seconds before fetching again
+            await new Promise(resolve => setTimeout(resolve, 3000));
         }
 
         // Clear state
