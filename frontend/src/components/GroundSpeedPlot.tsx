@@ -2,7 +2,7 @@ import React from 'react';
 import { XYChart, LineSeries, Axis } from '@visx/xychart';
 
 
-type AltitudePlotProps = {
+type GroundSpeedPlotProps = {
     data: { x: number, y: number }[]
   }
 
@@ -11,7 +11,7 @@ const getMinMax = (vals: (number | { valueOf(): number })[]) => {
     return [Math.min(...numericVals), Math.max(...numericVals)];
 };
   
-export default function AltitudePlot(props: AltitudePlotProps) {
+export default function GroundSpeedPlot(props: GroundSpeedPlotProps) {
     const inputData = props.data;
 
     // Return an empty div if there's no data
@@ -26,7 +26,7 @@ export default function AltitudePlot(props: AltitudePlotProps) {
             height={200}
           >
             <Axis orientation="bottom" tickValues= {inputData.map(d => d.x)} label="Time"/>
-            <Axis orientation="left" label="Altitude"/>
+            <Axis orientation="left" label="Ground Speed (kts)"/>
             <LineSeries
               data={inputData}
               xAccessor={(d: { x: number, y: number }) => d.x} 
