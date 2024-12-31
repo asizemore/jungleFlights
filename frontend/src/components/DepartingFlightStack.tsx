@@ -101,7 +101,6 @@ export default function DepartingFlightStack() {
     return (
         <Stack direction='row' spacing={2} sx={{ alignItems: 'center', justifyItems: 'flex-start'}}>
             <Paper sx={{padding: 2, width:'600px', height: '400px'}}>
-                <h3> Plot but a really long title</h3>
                 {altitudeData.length > 0 ? <AltitudePlot data={altitudeData} /> : <p>No data</p>}
                 {groundSpeedData.length > 0 ? <GroundSpeedPlot data={groundSpeedData} /> : <p>No data</p>}
             </Paper>
