@@ -12,10 +12,10 @@ import { Typography } from "@mui/material";
 function App() {
   return (
     <div>
-      <Box sx={{ display: 'flex', backgroundColor: 'yellow'}}>
+      <Box sx={{ display: 'flex', backgroundColor: '#fcfcfc'}}>
         <Stack spacing={2} sx={{ alignItems: 'center', justifyItems: 'center', width: '100%'}}>
           <AppBar position="static">
-            <h2>Jungle Noises</h2>
+            <Typography variant="h5" sx={{padding: '10px', paddingLeft: '20px'}}>Jungle Noises</Typography>
           </AppBar>
           <Typography variant="h4" component='div' sx={{padding: '50px'}}>
             Currently departing

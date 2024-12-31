@@ -4,14 +4,28 @@ import Paper from "@mui/material/Paper";
 import { Flight, FlightDetails } from "../types/Flight";
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
+import AltitudePlot from "./AltitudePlot";
+import GroundSpeedPlot from "./GroundSpeedPlot";
 
-// Here is where the functions for grabbing the info go
+
+type AltitudeData = {
+    x: number,
+    y: number
+}
+
+type GroundSpeedData = {
+    x: number,
+    y: number
+}
+
 
 export default function DepartingFlightStack() {
 
     // departing_flights might not be needed...
     const [departing_flights, setFlights] = useState<Array<Flight>>([]) 
     const [flight_on_runway, setFlightOnRunway] = useState<FlightDetails | null>(null);
+    const [altitudeData, setAltitudeData] = useState<AltitudeData[]>([]);
+    const [groundSpeedData, setGroundSpeedData] = useState<{ x: number, y: number }[]>([]);
 
     const fetchFlights = async () => {
         const response = await fetch("http://localhost:8000/pdrflights")
@@ -19,29 +33,46 @@ export default function DepartingFlightStack() {
         setFlights(departing_flights)
     }
 
-    // Fetch a specific flight with /flightonrunway
-    const fetchFlightOnRunway = async(flight_taking_off_id: string) => {
-        for (let i = 0; i < 20; i++) {
-            console.log(i);
-            console.log(departing_flights.filter(flight => flight.id === flight_taking_off_id));
 
+    // Fetch a specific flight with /flightonrunway
+    const fetchFlightOnRunway = async (flight_taking_off_id: string) => {
+
+        for (let i = 0; i < 20; i++) {
             const response = await fetch("http://localhost:8000/flightonrunway", {
-                method: 'POST', // Change to POST method
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json', // Add headers
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(departing_flights.filter(flight => flight.id === flight_taking_off_id)[0]) // Add body data as needed
+                body: JSON.stringify(departing_flights.filter(flight => flight.id === flight_taking_off_id)[0])
             });
             const flight_on_runway = await response.json();
-            console.log(flight_on_runway);
+
             setFlightOnRunway(flight_on_runway);
 
-            // Wait for 2 seconds before fetching again
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Update the altitude data
+            // Use a functional update to ensure we're updating the previous state.
+            setAltitudeData((prevAltitudeData: AltitudeData[]) => {
+                const newAltitude: number = +flight_on_runway.trail[0].alt;
+                const newAltitudeData = [...prevAltitudeData, { x: i, y: newAltitude }];
+                return newAltitudeData;
+            });
+
+            setGroundSpeedData((prevGroundSpeedData: GroundSpeedData[]) => {
+                const newGroundSpeed: number = +flight_on_runway.trail[0].spd;
+                const newGroundSpeedData = [...prevGroundSpeedData, { x: i, y: newGroundSpeed }];
+                return newGroundSpeedData;
+            });
+
+
+
+            // Wait for 3 seconds before fetching again
+            await new Promise(resolve => setTimeout(resolve, 3000));
         }
 
         // Clear state
         setFlightOnRunway(null);
+        setAltitudeData([]);
+        setGroundSpeedData([]);
     }
 
 
@@ -65,12 +96,13 @@ export default function DepartingFlightStack() {
         }
     }, [flight_taking_off_id]); // Dependency array to run when flights_taking_off changes
 
-    
 
+    console.log("plot's altitude data", altitudeData);
     return (
         <Stack direction='row' spacing={2} sx={{ alignItems: 'center', justifyItems: 'flex-start'}}>
             <Paper sx={{padding: 2, width:'600px', height: '400px'}}>
-                <h3> Plot but a really long title</h3>
+                {altitudeData.length > 0 ? <AltitudePlot data={altitudeData} /> : <p>No data</p>}
+                {groundSpeedData.length > 0 ? <GroundSpeedPlot data={groundSpeedData} /> : <p>No data</p>}
             </Paper>
             <Paper sx={{padding: 2, height: '400px', paddingX: 5}}>
                 {flight_on_runway ?
