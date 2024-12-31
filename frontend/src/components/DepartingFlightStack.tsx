@@ -4,14 +4,21 @@ import Paper from "@mui/material/Paper";
 import { Flight, FlightDetails } from "../types/Flight";
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
+import AltitudePlot from "./AltitudePlot";
 
-// Here is where the functions for grabbing the info go
+
+type AltitudeData = {
+    x: number,
+    y: number
+}
+
 
 export default function DepartingFlightStack() {
 
     // departing_flights might not be needed...
     const [departing_flights, setFlights] = useState<Array<Flight>>([]) 
     const [flight_on_runway, setFlightOnRunway] = useState<FlightDetails | null>(null);
+    const [altitudeData, setAltitudeData] = useState<AltitudeData[]>([]);
 
     const fetchFlights = async () => {
         const response = await fetch("http://localhost:8000/pdrflights")
@@ -19,11 +26,10 @@ export default function DepartingFlightStack() {
         setFlights(departing_flights)
     }
 
+
     // Fetch a specific flight with /flightonrunway
     const fetchFlightOnRunway = async(flight_taking_off_id: string) => {
         for (let i = 0; i < 20; i++) {
-            console.log(i);
-            console.log(departing_flights.filter(flight => flight.id === flight_taking_off_id));
 
             const response = await fetch("http://localhost:8000/flightonrunway", {
                 method: 'POST', // Change to POST method
@@ -36,12 +42,24 @@ export default function DepartingFlightStack() {
             console.log(flight_on_runway);
             setFlightOnRunway(flight_on_runway);
 
+            // Update the altitude data
+            const newAltitude: number = +flight_on_runway.trail[0].alt;
+            // const newAltitudeData = altitudeData.push({x: i, y: newAltitude});
+            const newAltitudeData = [...altitudeData, {x: i, y: newAltitude}];
+            setAltitudeData(newAltitudeData);
+            console.log(newAltitudeData);
+            // ignore the type error for now
+            // @ts-ignore
+            // setAltitudeData(altitudeData.push({x: i, y: Number(flight_on_runway.trail[0].alt)}) as AltitudeData[]);
+            console.log(altitudeData);
+
             // Wait for 2 seconds before fetching again
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
 
         // Clear state
         setFlightOnRunway(null);
+        setAltitudeData([]);
     }
 
 
@@ -65,12 +83,13 @@ export default function DepartingFlightStack() {
         }
     }, [flight_taking_off_id]); // Dependency array to run when flights_taking_off changes
 
-    
 
+    console.log("plot's altitude data", altitudeData);
     return (
         <Stack direction='row' spacing={2} sx={{ alignItems: 'center', justifyItems: 'flex-start'}}>
             <Paper sx={{padding: 2, width:'600px', height: '400px'}}>
                 <h3> Plot but a really long title</h3>
+                {altitudeData.length > 0 ? <AltitudePlot data={altitudeData} /> : <p>No data</p>}
             </Paper>
             <Paper sx={{padding: 2, height: '400px', paddingX: 5}}>
                 {flight_on_runway ?
